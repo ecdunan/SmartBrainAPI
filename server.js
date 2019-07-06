@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const app = express();
 
 /* db placeholder */
@@ -22,6 +23,10 @@ const database = {
         }]
 }
 
+app.use(bodyParser.json());
+app.use(cors());
+
+
 const getUser = id =>{
     const users = database.users;
 
@@ -34,8 +39,6 @@ const getUser = id =>{
     return null;
 }
 
-app.use(bodyParser.json());
-
 app.get('/', (req, res) => {
     res.send(database.users);
 });
@@ -43,7 +46,7 @@ app.get('/', (req, res) => {
 app.post('/signin', (req, res) => {
      if(req.body.email === database.users[0].email &&
         req.body.password === database.users[0].password) {
-        res.json('success');
+        res.json(users[0]);
     } else {
         res.status(404).json('error logging in');
     }
@@ -51,7 +54,9 @@ app.post('/signin', (req, res) => {
 
 app.post('/register', (req, res) => {
     const {name, email, password} = req.body;
-    const newUser = {id: '3',
+    const users = database.users;
+    const id = Number(users[users.length-1].id) + 1;
+    const newUser = {id: id,
                     name: name,
                     email: email,
                     password: password,
