@@ -4,7 +4,7 @@ const cors = require('cors');
 const knex = require('knex');
 
 const app = express();
-const postgres = knex({
+const db = knex({
     client: 'pg',
     connection: {
         host: '127.0.0.1',
@@ -13,8 +13,6 @@ const postgres = knex({
         database: 'smartbrain'
     }
 });
-
-console.log(postgres.select('*').from('users'));
 
 /* db placeholder */
 const database = {
@@ -67,20 +65,19 @@ app.post('/signin', (req, res) => {
 
 app.post('/register', (req, res) => {
     const {name, email, password} = req.body;
-    const users = database.users;
-    const id = Number(users[users.length-1].id) + 1;
-    const newUser = {id: id,
-                    name: name,
-                    email: email,
-                    password: password,
-                    entries: 0,
-                    joined: new Date()};
+    db('users')
+        .returning('*')
+        .insert({
+            name: name,
+            email: email,
+            entries: 0,
+            joined: new Date()
+        })
+        .then(user => res.json(user[0]))
+        .catch(err => res.status(400).json('unable to register'));
 
-    if(database.users.push(newUser)) {
-        res.json(newUser);
-    } else {
-        res.status('404').json('error creating user');
-    }
+    // res.status('404').json('error creating user');
+
 });
 
 app.get('/profile/:id', (req, res) => {
