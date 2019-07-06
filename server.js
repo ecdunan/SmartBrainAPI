@@ -75,20 +75,22 @@ app.post('/register', (req, res) => {
         })
         .then(user => res.json(user[0]))
         .catch(err => res.status(400).json('unable to register'));
-
-    // res.status('404').json('error creating user');
-
 });
 
 app.get('/profile/:id', (req, res) => {
     const { id } = req.params;
-    const user = getUser(id);
 
-    if(user) {
-        res.json(user);
-    } else {
-        res.status('404').json('userid does not exist.');
-    }
+    db('users')
+        .select('*')
+        .where({id})
+        .then(user => {
+            if(user.length > 0) {
+                res.json(user[0])
+            } else {
+                res.status('400').json('user not found')
+            }
+        })
+        .catch(err => res.status('400').send(err));
 });
 
 app.put('/image', (req, res) => {
