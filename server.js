@@ -30,6 +30,6 @@ app.get('/profile/:id', profile.handleProfile(db));
 app.put('/image', image.handleImage(db));
 app.post('/imageurl', (req, res) => image.handleAPICall(req, res));
 
-app.listen(3000, () => {
-    console.log('App started on port 3000');
+app.listen(process.env.PORT, () => {
+    console.log(`App started on port 3000 ${process.env.PORT}`);
 });
